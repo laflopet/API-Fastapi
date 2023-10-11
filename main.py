@@ -1,27 +1,14 @@
-from fastapi import FastAPI, Path
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
-from typing import List, Optional
+from fastapi import FastAPI
+from config.database import engine, Base
+from middlewares.error_handler import ErrorHandler
+from routers.user import user_router
+
 
 app = FastAPI()
+app.title = "Api Users"
+app.version = "0.0.1"
 
-app.title = 'Users and Directions'
-app.version = '1.0'
+app.add_middleware(ErrorHandler)
+app.include_router(user_router)
 
-
-class User(BaseModel):
-    id: Optional[int] = None
-    first_name: str = Field()
-    last_name: str
-    email: str
-    password: str
-    addresses: List[str] = []
-
-class Direction(BaseModel):
-    id: int
-    address_1: str
-    address_2: str
-    city:str
-    state:str
-    zip: int
-    country: str
+Base.metadata.create_all(bind=engine)
